@@ -19,6 +19,10 @@
         margin-right: auto;
         margin-left: auto;
     }
+    .pfp{
+        width: 100px;
+        height: 100px;
+    }
 </style>
 </head>
 <body>
@@ -38,6 +42,7 @@
             <div class="main bg-light border p-4 table-responsive">
             <table class="table">
             <thead>
+                <th>Profile Picture</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
@@ -49,6 +54,7 @@
             </thead>
             @foreach($users as $key => $data)
             <tr>
+                <td><img class="pfp" src="{{ asset('storage/'.$data->profile_path) }}"></td>
                 <td>{{$data->first_name}}</td>
                 <td>{{$data->last_name}}</td>
                 <td>{{$data->email}}</td>

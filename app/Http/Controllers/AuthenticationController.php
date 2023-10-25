@@ -17,6 +17,26 @@ class AuthenticationController extends Controller
 
     // Registering a New User and storing in Database
     public function store(Request $request) {
+        
+        // dd($request);
+        $validated = $request->validate([
+            'profile_picture' => 'required|mimes:png,jpg',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'country' => 'required',
+            'city' => 'required',
+            'phone_no' => 'required',
+            'address' => 'required',
+        ]);
+
+        $file = $request->file('profile_picture');
+        $filename = "pfp".uniqid().'.'.$file->getClientOriginalExtension();
+        $directory = "profile_pictures";
+        $file_path = $file->storeAs($directory, $filename, 'public');
+
+
         $user = new User();
 
         $first_name = $request["first_name"];
@@ -28,6 +48,7 @@ class AuthenticationController extends Controller
         $address = $request["address"];
         $city = $request["city"];
 
+        $user->profile_path = $file_path;
         $user->first_name = $first_name;
         $user->last_name = $last_name;
         $user->email = $email;
@@ -39,7 +60,7 @@ class AuthenticationController extends Controller
 
         $user->save();
 
-        return redirect('/');        
+        // return redirect('/');        
     }
 
 
