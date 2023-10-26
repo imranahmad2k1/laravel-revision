@@ -7,46 +7,46 @@
 </head>
 <body>
     <h1>Update User</h1>
-    <form action="{{ route('edit',$data->id) }}" method="post">
-        @csrf
+    <form action="{{ route('edit',$user->id) }}" method="post">
+    @csrf
         @method('PUT')
         <label for="first_name"><b>First Name</b></label>
-        <input type="text" placeholder="Enter your First Name" name="first_name" value="{{$data->first_name}}", value="{{$data->first_name}}" required>
+        <input type="text" placeholder="Enter your First Name" name="first_name" value="{{$user->first_name}}", value="{{$user->first_name}}">
 
         <br><br>
 
         <label for="last_name"><b>Last Name</b></label>
-        <input type="text" placeholder="Enter your Last Name" name="last_name" value="{{$data->last_name}}" required>
+        <input type="text" placeholder="Enter your Last Name" name="last_name" value="{{$user->last_name}}">
 
         <br><br>
 
         <label for="email"><b>Email</b></label>
-        <input type="text" placeholder="Enter your Email" name="email" value="{{$data->email}}" required>
+        <input type="text" placeholder="Enter your Email" name="email" value="{{$user->email}}">
 
         <br><br>
 
         <label for="password"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="password" value="{{$data->password}}" required>
+        <input type="password" placeholder="Enter Password" name="password" value="{{$user->password}}">
 
         <br><br>
 
         <label for="country"><b>Country</b></label>
-        <input type="text" placeholder="Enter your Country" name="country" value="{{$data->country}}" required>
+        <input type="text" placeholder="Enter your Country" name="country" value="{{$user->country}}">
 
         <br><br>
 
         <label for="phone_no"><b>Phone Number</b></label>
-        <input type="text" placeholder="Enter your Phone Number" name="phone_no" value="{{$data->phone_no}}" required>
+        <input type="text" placeholder="Enter your Phone Number" name="phone_no" value="{{$user->phone_no}}">
 
         <br><br>
 
         <label for="address"><b>Address</b></label>
-        <input type="text" placeholder="Enter your Address" name="address" value="{{$data->address}}" required>
+        <input type="text" placeholder="Enter your Address" name="address" value="{{$user->address}}">
 
         <br><br>
 
         <label for="city"><b>City</b></label>
-        <input type="text" placeholder="Enter your City" name="city" value="{{$data->city}}" required>
+        <input type="text" placeholder="Enter your City" name="city" value="{{$user->city}}">
 
         <br><br>
 

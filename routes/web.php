@@ -18,23 +18,13 @@ use App\Models\User;
 //     return view('welcome');
 // });
 
-Route::get('/', [AuthenticationController::class, 'getUsers']);
+Route::get('/users/all', [AuthenticationController::class, 'getAllUsers']);
+Route::post('/users/create', [AuthenticationController::class, 'createUser'])->name('store');
+Route::get('/users/{id}',[AuthenticationController::class, 'getUser'])->name('getuser');
+Route::patch('/users/{id}', [AuthenticationController::class, 'updateRecord']);
+Route::get('/users/delete/{id}', [AuthenticationController::class, 'deleteRecord']);
 
-Route::get('/register', function () {
-    return view('register');
-});
 
-Route::get('/login', function () {
-    return view('login');
-});
-
+// -----IRRELEVANT TO CRUD---
 Route::post('/login', [AuthenticationController::class, 'authenticate'])->name('authenticate');
-Route::post('/store', [AuthenticationController::class, 'store'])->name('store');
-
-Route::get('/edit/{id}',function($id){
-    $user=User::find($id);
-    return view('edit', ['data' => $user]);
-})->name('edit');
-
-Route::put('/edit/{user}', [AuthenticationController::class, 'saveRecord']);
-Route::get('/delete/{user}', [AuthenticationController::class, 'deleteRecord']);
+Route::view('/login','login');
