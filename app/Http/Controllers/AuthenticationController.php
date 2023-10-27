@@ -7,6 +7,7 @@ use App\Models\User;
 use Auth;
 use App\Helpers\PhoneNumbers;
 use App\Helpers\Countries;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -51,11 +52,13 @@ class AuthenticationController extends Controller
             return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
         }
 
-        // Saving File Locally and Getting File Path to Store in Database
-        $file = $request->file('profile_picture');
-        $filename = "pfp".uniqid().'.'.$file->getClientOriginalExtension();
-        $directory = "profile_pictures";
-        $file_path = $file->storeAs($directory, $filename, 'public');
+        // // Saving File Locally and Getting File Path to Store in Database
+        // $file = $request->file('profile_picture');
+        // $filename = "pfp".uniqid().'.'.$file->getClientOriginalExtension();
+        // $directory = "profile_pictures";
+        // $file_path = $file->storeAs($directory, $filename, 'public');
+
+        $file_path = Helper::pictureUpload($request->file('profile_picture'));
 
         // Making a new User in database and copying Request's data into it
         $user = new User();
@@ -104,14 +107,12 @@ class AuthenticationController extends Controller
 
     // Updating record of a user in database
     public function updateRecord(Request $request, String $id){
-
         // Phone number cleaning before 11 digits validation
         $phone_no = $request->input('phone_no');
         $cleanedPhoneNo = preg_replace('/\D/', '', $phone_no);
 
         $validator = Validator::make([
             'phone_no' => $cleanedPhoneNo,
-            'profile_picture' => $request->file('profile_picture'),
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
             'email' => $request->input('email'),
@@ -119,7 +120,6 @@ class AuthenticationController extends Controller
             'city' => $request->input('city'),
             'address' => $request->input('address'),
         ], [
-            'profile_picture' => 'required|mimes:png,jpg',
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
@@ -129,13 +129,24 @@ class AuthenticationController extends Controller
             'address' => 'required',
         ]);
 
+        if ($request->hasFile('profile_picture')) {
+            $validator->sometimes('profile_picture', 'mimes:png,jpg', function ($input) {
+                return $input->hasFile('profile_picture');
+            });
+        }
+
         if ($validator->fails()){
             return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
         }
-
+        
         $user = User::find($id);
+        
         if($user){
-            $user->update($request->all());
+            if($request->hasFile('profile_picture')){
+                $file_path = Helper::pictureUpload($request->file('profile_picture'));
+                $user->profile_path = $file_path;
+            }
+            $user->update($request->except('profile_picture'));
             $response = ["status"=>true, "message"=>"Record has been updated"];
         }
         else{
@@ -151,12 +162,13 @@ class AuthenticationController extends Controller
         if($user){
             \Session::flash('delete_success','Successfully deleted '.$user->first_name);
             $user->delete();
-            return redirect('/');
+            $response = ["status"=>true, "message"=>"User has been deleted successfully"];
         }
         else{
             \Session::flash('delete_fail', "Error: Couldn't find the user in database");
-            return redirect('/');
+            $response = ["status"=>false, "message"=>"Couldn't delete user, something went wrong!"];
         }
+        return $response;
     }
 
     // ---------------------IRRELEVANT TO CRUD------------------

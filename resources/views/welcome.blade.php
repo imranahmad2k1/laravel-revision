@@ -80,12 +80,10 @@
                 <td>{{$user->address}}</td>
                 <td>{{$user->city}}</td>
                 <td>
-                    {{-- <a href="{{ route('edit',$user->id) }}" class="btn btn-success">Edit</a> --}}
                     <button onclick="editUser(event,this,'{{ route('edituser',['id'=>$user->id]) }}',{{$user}})" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">
                         Edit
                     </button>
-                    <a href="{{ url('users/delete/'.$user->id) }}" class="btn btn-danger">Delete</a>
-                    <!-- <a href="#" class="btn btn-primary">View</a> -->
+                    <button onclick="deleteUser(event, this, '{{ route('deleteuser', ['id'=>$user->id]) }}')" class="btn btn-danger">Delete</button>
                 </td>
             </tr>
             @endforeach
@@ -204,7 +202,7 @@
                 <img src="" class="pfp" id="profile_picture_edit" alt="profile-picture">
                 <div class="form-group mb-3">
                     <label for="profile_picture"><b>Profile picture</b></label>
-                    <input type="file" name="profile_picture" id="profile_picture_input" placeholder="" >
+                    <input type="file" name="profile_picture" id="profile_picture_input" placeholder="" onchange="previewFile()" >
                     <br>
                     <span class="error" id="profile_picture_edit"></span>
                 </div>
@@ -330,7 +328,8 @@
    // Editing User using AJAX
     function editUser(event, obj, route, user){
         // $('#profile_picture_input').val(user['profile_path']);
-        $('#profile_picture_edit').attr('src', "{{ asset('storage/'.$user['profile_path']) }}");
+        // user['profile_path'])
+        $('#profile_picture_edit').attr('src', "{{ asset('storage/') }}/" + user['profile_path']);
         $('#first_name_input').val(user['first_name']);
         $('#last_name_input').val(user['last_name']);
         $('#email_input').val(user['email']);
@@ -339,13 +338,15 @@
         $('#address_input').val(user['address']);
         $('#city_input').val(user['city']);
 
-        $('#update_record_btn').click(function (e){
+        $('#update_form').submit(function (e){
+            let formData = new FormData($(this)[0]);
             e.preventDefault();
             $.ajax({
-                data: $('#update_form').serialize(),
+                data: formData,
                 url: route,
-                type: 'PATCH',
-                dataType: 'json',
+                processData: false,
+                contentType: false,
+                type: 'POST',
                 success: function(response){
                     if(response.status){
                         $('#update_form').trigger("reset");
@@ -363,10 +364,43 @@
                             });
                         }
                     }
-                    // $('#users_table').DataTable().ajax.reload();
                 }
             })
         });
+    }
+
+    // Deleting a user using AJAX
+    function deleteUser(event, obj, route){
+        let confirmationDialog = confirm('Are you sure?');
+        if(confirmationDialog){
+            $.ajax({
+                type: 'delete',
+                url: route,
+                success: function(response){
+                    if(response.status){
+                        alert(response.message);
+                    }
+                    else{
+                        alert(response.message);
+                    }
+                }
+            });
+        }
+    }
+
+    function previewFile() {
+        const fileInput = document.getElementById('profile_picture_input');
+        const preview = document.getElementById('profile_picture_edit');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '';
+        }
     }
   </script>
 </body>
