@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Auth;
 use App\Helpers\PhoneNumbers;
+use App\Helpers\Countries;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AuthenticationController extends Controller
 {
-
     // Retrieving all Users from the Database
     public function getAllUsers(){
         $users = User::all();
@@ -18,17 +20,37 @@ class AuthenticationController extends Controller
 
     // Registering a New User and storing in Database
     public function createUser(Request $request) {
-        $validated = $request->validate([
+
+        // Phone number cleaning before 11 digits validation
+        $phone_no = $request->input('phone_no');
+        $cleanedPhoneNo = preg_replace('/\D/', '', $phone_no);
+
+        $validator = Validator::make([
+            'phone_no' => $cleanedPhoneNo,
+            'profile_picture' => $request->file('profile_picture'),
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+            'country' => $request->input('country'),
+            'city' => $request->input('city'),
+            'address' => $request->input('address'),
+        ], [
             'profile_picture' => 'required|mimes:png,jpg',
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'country' => 'required',
+            'country' => ['required', Rule::in(Countries::getCountries())],
             'city' => 'required',
             'phone_no' => 'required|digits:11',
             'address' => 'required',
         ]);
+
+        if ($validator->fails()){
+            return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
+        }
+     
 
         // Saving File Locally and Getting File Path to Store in Database
         $file = $request->file('profile_picture');
@@ -44,10 +66,7 @@ class AuthenticationController extends Controller
         $email = $request["email"];
         $password = $request["password"];
         $country = $request["country"];
-
-        // Masking Phone Number before Saving to Database
-        $phone_no = PhoneNumbers::formatPhoneNumber($request["phone_no"]);
-
+        $phone_no = $request["phone_no"];
         $address = $request["address"];
         $city = $request["city"];
 
@@ -61,10 +80,16 @@ class AuthenticationController extends Controller
         $user->address = $address;
         $user->city = $city;
 
-        $response = $user->save();
+        $user->save();
 
-        \Session::flash('new_user', "Added New User");
-        return $response;     
+        if(isset($user->id)){
+            \Session::flash('new_user', "Added New User");
+            $response = ["status"=>true, "message"=>"Successfully saved user", "data" => $user];
+        }
+        else{
+            $response = ["status"=>false, "message"=>"Couldn't save user, something went wrong!"];
+        }
+        return $response; 
     }
 
     public function getUser(String $id){
@@ -73,7 +98,7 @@ class AuthenticationController extends Controller
             $response = ["status"=>true, "message"=>"Successfully retrieved User", "data" => $user];
         }
         else{
-            $response = ["status"=>false, "message"=>"Something went wrong!"];
+            $response = ["status"=>false, "message"=>"Couldn't get user, something went wrong!"];
         }
         return $response;
     }

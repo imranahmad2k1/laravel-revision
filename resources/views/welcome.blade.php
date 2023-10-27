@@ -24,6 +24,11 @@
         width: 100px;
         height: 100px;
     }
+    .error{
+        color: red; 
+        font-size: 18px; 
+        font-style:italic
+    }
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -108,80 +113,71 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="profile_picture"><b>Profile picture</b></label>
                     <input type="file" name="profile_picture">
-                    @error('profile_picture')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <br>
+                    <span class="error" id="profile_picture_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="first_name"><b>First Name</b></label>
-                    <input type="text" placeholder="Enter your First Name" name="first_name">
-                    @error('first_name')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <input type="text" placeholder="Enter your First Name" name="first_name" >
+                    <br>
+                    <span class="error" id="first_name_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="last_name"><b>Last Name</b></label>
-                    <input type="text" placeholder="Enter your Last Name" name="last_name">
-                    @error('last_name')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <input type="text" placeholder="Enter your Last Name" name="last_name" >
+                    <br>
+                    <span class="error" id="last_name_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="email"><b>Email</b></label>
-                    <input type="text" placeholder="Enter your Email" name="email">
-                    @error('email')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <input type="text" placeholder="Enter your Email" name="email" >
+                    <br>
+                    <span class="error" id="email_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password">
-                    @error('password')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <input type="password" placeholder="Enter Password" name="password" >
+                    <br>
+                    <span class="error" id="password_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="country"><b>Country</b></label>
-                    <select name="country" id="country">
+                    <select name="country" >
                         @foreach (Countries::getCountries() as $country )
                         <option value="{{$country}}">{{$country}}</option>
                         @endforeach
                     </select>
-                    @error('country')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <br>
+                    <span class="error" id="country_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="phone_no"><b>Phone Number</b></label>
-                    <input type="text" placeholder="Enter your Phone Number" name="phone_no">
-                    @error('phone_no')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <input type="text" placeholder="Enter your Phone Number" name="phone_no" class="phone_no">
+                    <br>
+                    <span class="error" id="phone_no_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="address"><b>Address</b></label>
                     <input type="text" placeholder="Enter your Address" name="address">
-                    @error('address')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <br>
+                    <span class="error" id="address_register"></span>
                 </div>
         
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="city"><b>City</b></label>
                     <input type="text" placeholder="Enter your City" name="city">
-                    @error('city')
-                        <br><em class="error">{{ $message }}</em>
-                    @enderror
+                    <br>
+                    <span class="error" id="city_register"></span>
                 </div>       
             </div>
             <div class="modal-footer">
@@ -209,51 +205,37 @@
             <div class="modal-body">
                 <label for="first_name"><b>First Name</b></label>
                 <input type="text" placeholder="Enter your First Name" name="first_name" id="first_name_input">
-                @error('first_name')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
         
                 <label for="last_name"><b>Last Name</b></label>
                 <input type="text" placeholder="Enter your Last Name" name="last_name" id="last_name_input">
-                @error('last_name')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
         
                 <label for="email"><b>Email</b></label>
                 <input type="text" placeholder="Enter your Email" name="email" id="email_input">
-                @error('email')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
         
                 <label for="country"><b>Country</b></label>
                 <input type="text" placeholder="Enter your Country" name="country" id="country_input">
-                @error('country')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
         
                 <label for="phone_no"><b>Phone Number</b></label>
                 <input type="text" placeholder="Enter your Phone Number" name="phone_no" id="phone_no_input">
-                @error('phone_no')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
         
                 <label for="address"><b>Address</b></label>
                 <input type="text" placeholder="Enter your Address" name="address" id="address_input">
-                @error('address')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
         
                 <label for="city"><b>City</b></label>
                 <input type="text" placeholder="Enter your City" name="city" id="city_input">
-                @error('city')
-                    <br><em class="error">{{ $message }}</em>
-                @enderror
+
                 <br><br>
             </div>
             <div class="modal-footer">
@@ -266,12 +248,27 @@
   </div>
   <script src="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
   <script>
+    // Hide errors on Writing something, Selecting and option, and on File Selection
+    $('input').on('keyup change', function() {
+        let input_name = $(this).attr('name');
+        $("#" + input_name + "_register").text("");
+    });
+
+    // Masking phone number
+    $('.phone_no').inputmask('(9999)-999-9999');
+
+    // Setting CSRF Token for POST Requests
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     
-    // Create User Form Submission
+    // Creating User using AJAX
     $('#create_user_form').submit(function(e){
         let formData = new FormData($(this)[0]);
-        console.log(formData);
         e.preventDefault();
         $.ajax({
             type: 'POST',
@@ -279,22 +276,27 @@
             processData: false,
             contentType: false,
             data: formData,
-            success: (data) => {
-                if(data == 1){
+            success: function(response) {
+                if(response.status){
                     $("#registerModal").modal('hide');
+                    alert(response.message);
+                }
+                else{
+                    if($.isEmptyObject(response.data)){
+                        alert(response.message);
+                    }
+                    else{
+                        let errors = response.data;
+                        $.each(errors, function(key, value ){
+                            $("#"+key+"_register").text(value);
+                        });
+                    }
                 }
             },
-            error: function(data) {
-                console.log(data);
-            }
         });
     });
 
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+   // Editing User using AJAX
     function getUser(event, obj, route){
         $.ajax({
             type:'GET',
