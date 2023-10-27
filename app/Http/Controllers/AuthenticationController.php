@@ -50,7 +50,6 @@ class AuthenticationController extends Controller
         if ($validator->fails()){
             return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
         }
-     
 
         // Saving File Locally and Getting File Path to Store in Database
         $file = $request->file('profile_picture');
@@ -105,17 +104,34 @@ class AuthenticationController extends Controller
 
     // Updating record of a user in database
     public function updateRecord(Request $request, String $id){
-        $validated = $request->validate([
+
+        // Phone number cleaning before 11 digits validation
+        $phone_no = $request->input('phone_no');
+        $cleanedPhoneNo = preg_replace('/\D/', '', $phone_no);
+
+        $validator = Validator::make([
+            'phone_no' => $cleanedPhoneNo,
+            'profile_picture' => $request->file('profile_picture'),
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'country' => $request->input('country'),
+            'city' => $request->input('city'),
+            'address' => $request->input('address'),
+        ], [
             'profile_picture' => 'required|mimes:png,jpg',
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
-            'password' => 'required',
-            'country' => 'required',
+            'country' => ['required', Rule::in(Countries::getCountries())],
             'city' => 'required',
             'phone_no' => 'required|digits:11',
             'address' => 'required',
         ]);
+
+        if ($validator->fails()){
+            return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
+        }
 
         $user = User::find($id);
         if($user){

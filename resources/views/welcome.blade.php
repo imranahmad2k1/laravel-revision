@@ -81,7 +81,7 @@
                 <td>{{$user->city}}</td>
                 <td>
                     {{-- <a href="{{ route('edit',$user->id) }}" class="btn btn-success">Edit</a> --}}
-                    <button onclick="getUser(event,this,'{{ route('getuser',['id'=>$user->id]) }}')" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">
+                    <button onclick="editUser(event,this,'{{ route('edituser',['id'=>$user->id]) }}',{{$user}})" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">
                         Edit
                     </button>
                     <a href="{{ url('users/delete/'.$user->id) }}" class="btn btn-danger">Delete</a>
@@ -194,50 +194,75 @@
   <div class="modal fade" id="edit_user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        {{-- <form action="{{ route('edit',$user->id) }}" method="post">
-            @csrf --}}
         <form id="update_form">
-            {{-- @csrf --}}
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Update a User</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
-                <label for="first_name"><b>First Name</b></label>
-                <input type="text" placeholder="Enter your First Name" name="first_name" id="first_name_input">
-
-                <br><br>
+                <img src="" class="pfp" id="profile_picture_edit" alt="profile-picture">
+                <div class="form-group mb-3">
+                    <label for="profile_picture"><b>Profile picture</b></label>
+                    <input type="file" name="profile_picture" id="profile_picture_input" placeholder="" >
+                    <br>
+                    <span class="error" id="profile_picture_edit"></span>
+                </div>
         
-                <label for="last_name"><b>Last Name</b></label>
-                <input type="text" placeholder="Enter your Last Name" name="last_name" id="last_name_input">
-
-                <br><br>
+                <div class="form-group mb-3">
+                    <label for="first_name"><b>First Name</b></label>
+                    <input type="text" placeholder="Enter your First Name" name="first_name" id="first_name_input"  >
+                    <br>
+                    <span class="error" id="first_name_edit"></span>
+                </div>
         
-                <label for="email"><b>Email</b></label>
-                <input type="text" placeholder="Enter your Email" name="email" id="email_input">
-
-                <br><br>
+                <div class="form-group mb-3">
+                    <label for="last_name"><b>Last Name</b></label>
+                    <input type="text" placeholder="Enter your Last Name" name="last_name" id="last_name_input"  >
+                    <br>
+                    <span class="error" id="last_name_edit"></span>
+                </div>
         
-                <label for="country"><b>Country</b></label>
-                <input type="text" placeholder="Enter your Country" name="country" id="country_input">
-
-                <br><br>
+                <div class="form-group mb-3">
+                    <label for="email"><b>Email</b></label>
+                    <input type="text" placeholder="Enter your Email" name="email" id="email_input"  >
+                    <br>
+                    <span class="error" id="email_edit"></span>
+                </div>
         
-                <label for="phone_no"><b>Phone Number</b></label>
-                <input type="text" placeholder="Enter your Phone Number" name="phone_no" id="phone_no_input">
-
-                <br><br>
+                <div class="form-group mb-3">
+                    <label for="country"><b>Country</b></label>
+                    <select name="country" id="country_input"  >
+                        @foreach (Countries::getCountries() as $country )
+                        <option value="{{$country}}">{{$country}}</option>
+                        @endforeach
+                    </select>
+                    <br>
+                    <span class="error" id="country_edit"></span>
+                </div>
         
-                <label for="address"><b>Address</b></label>
-                <input type="text" placeholder="Enter your Address" name="address" id="address_input">
-
-                <br><br>
+                <div class="form-group mb-3">
+                    <label for="phone_no"><b>Phone Number</b></label>
+                    <input type="text" placeholder="Enter your Phone Number" name="phone_no" id="phone_no_input"  class="phone_no">
+                    <br>
+                    <span class="error" id="phone_no_edit"></span>
+                </div>
         
-                <label for="city"><b>City</b></label>
-                <input type="text" placeholder="Enter your City" name="city" id="city_input">
-
-                <br><br>
+                <div class="form-group mb-3">
+                    <label for="address"><b>Address</b></label>
+                    <input type="text" placeholder="Enter your Address" name="address" id="address_input" >
+                    <br>
+                    <span class="error" id="address_edit"></span>
+                </div>
+        
+                <div class="form-group mb-3">
+                    <label for="city"><b>City</b></label>
+                    <input type="text" placeholder="Enter your City" name="city" id="city_input" >
+                    <br>
+                    <span class="error" id="city_edit"></span>
+                </div>       
             </div>
+    
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" id="update_record_btn" class="btn btn-primary">Update Record</button>
@@ -254,6 +279,12 @@
     $('input').on('keyup change', function() {
         let input_name = $(this).attr('name');
         $("#" + input_name + "_register").text("");
+    });
+
+    // Hide errors on Writing something, Selecting and option, and on File Selection
+    $('input').on('keyup change', function() {
+        let input_name = $(this).attr('name');
+        $("#" + input_name + "_edit").text("");
     });
 
     // Masking phone number
@@ -297,27 +328,16 @@
     });
 
    // Editing User using AJAX
-    function getUser(event, obj, route){
-        $.ajax({
-            type:'GET',
-            url: route, 
-            success:function(response) {
-                if(response.status){
-                    let user = response.data;
-                    $('#first_name_input').val(user['first_name']);
-                    $('#last_name_input').val(user['last_name']);
-                    $('#email_input').val(user['email']);
-                    $('#country_input').val(user['country']);
-                    $('#phone_no_input').val(user['phone_no']);
-                    $('#address_input').val(user['address']);
-                    $('#city_input').val(user['city']);
-                    alert(response.message);
-                }
-                else{
-                    alert(response.message);
-                }
-            },
-        });
+    function editUser(event, obj, route, user){
+        // $('#profile_picture_input').val(user['profile_path']);
+        $('#profile_picture_edit').attr('src', "{{ asset('storage/'.$user['profile_path']) }}");
+        $('#first_name_input').val(user['first_name']);
+        $('#last_name_input').val(user['last_name']);
+        $('#email_input').val(user['email']);
+        $('#country_input').val(user['country']);
+        $('#phone_no_input').val(user['phone_no']);
+        $('#address_input').val(user['address']);
+        $('#city_input').val(user['city']);
 
         $('#update_record_btn').click(function (e){
             e.preventDefault();
@@ -333,7 +353,15 @@
                         alert(response.message);
                     }
                     else{
-                        alert(response.message);
+                        if($.isEmptyObject(response.data)){
+                            alert(response.message);
+                        }
+                        else{
+                            let errors = response.data;
+                            $.each(errors, function(key, value ){
+                                $("#"+key+"_edit").text(value);
+                            });
+                        }
                     }
                     // $('#users_table').DataTable().ajax.reload();
                 }

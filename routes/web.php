@@ -21,7 +21,7 @@ use App\Models\User;
 Route::get('/users/all', [AuthenticationController::class, 'getAllUsers']);
 Route::post('/users/create', [AuthenticationController::class, 'createUser'])->name('store');
 Route::get('/users/{id}',[AuthenticationController::class, 'getUser'])->name('getuser');
-Route::patch('/users/{id}', [AuthenticationController::class, 'updateRecord']);
+Route::patch('/users/{id}', [AuthenticationController::class, 'updateRecord'])->name('edituser');
 Route::get('/users/delete/{id}', [AuthenticationController::class, 'deleteRecord']);
 
 
