@@ -10,13 +10,42 @@ use App\Helpers\Countries;
 use App\Helpers\Helper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use DataTables;
 
 class AuthenticationController extends Controller
 {
+    public function index(){
+         return view('welcome');
+    }
+
     // Retrieving all Users from the Database
     public function getAllUsers(){
-        $users = User::all();
-        return view('welcome', ['users' => $users]);
+        // $users = User::all();
+        // if($users){
+        //     $response = ["status"=>true, "message"=>"Successfully retrieved all users", "data"=>$users];
+        // }
+        // else{
+        //     $response = ["status"=>false, "message"=>"Couldn't retrieve users, something went wrong"];
+        // }
+        // return $response;
+
+
+        $data = User::latest()->get();
+        return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function($user){
+
+                    // <button onclick="deleteUser(event, this, '{{ route('deleteuser', ['id'=>$user->id]) }}')" class="btn btn-danger">Delete</button>
+                    // <button onclick="editUser(event,this,'{{ route('edituser',['id'=>$user->id]) }}',{{$user}})" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">
+
+                    return view('components.useractions', compact('user'))->render();
+                    $btn = '<button onclick="editUser(event, this, \'' . route('edituser', ['id' => $row->id]) . '\', ' . htmlspecialchars(json_encode($row)) . ')" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">Edit</button>';
+                    $btn .= '<button onclick="deleteUser(event, this, \'' . route('deleteuser', ['id' => $row->id]) . '\')" class="btn btn-danger">Delete</button>';
+                    return $btn;                    
+                    
+                })
+                ->rawColumns(['action'])
+                ->make(true);
     }
 
     // Registering a New User and storing in Database
@@ -42,7 +71,7 @@ class AuthenticationController extends Controller
             'last_name' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'country' => ['required', Rule::in(Countries::getCountries())],
+            'country' => ['required', Rule::in(Helper::getCountries())],
             'city' => 'required',
             'phone_no' => 'required|digits:11',
             'address' => 'required',
@@ -52,12 +81,7 @@ class AuthenticationController extends Controller
             return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
         }
 
-        // // Saving File Locally and Getting File Path to Store in Database
-        // $file = $request->file('profile_picture');
-        // $filename = "pfp".uniqid().'.'.$file->getClientOriginalExtension();
-        // $directory = "profile_pictures";
-        // $file_path = $file->storeAs($directory, $filename, 'public');
-
+        // Saving File Locally and Getting File Path to Store in Database
         $file_path = Helper::pictureUpload($request->file('profile_picture'));
 
         // Making a new User in database and copying Request's data into it
@@ -123,7 +147,7 @@ class AuthenticationController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
-            'country' => ['required', Rule::in(Countries::getCountries())],
+            'country' => ['required', Rule::in(Helper::getCountries())],
             'city' => 'required',
             'phone_no' => 'required|digits:11',
             'address' => 'required',

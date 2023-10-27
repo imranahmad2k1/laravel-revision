@@ -8,5 +8,9 @@ class Helper{
         $directory = "profile_pictures";
         $file_path = $file->storeAs($directory, $filename, 'public');
         return $file_path;
-    } 
+    }
+
+    public static function getCountries(){
+        return ['Pakistan', 'Afghanistan', 'Turkey', 'China', 'Malaysia'];
+    }
 }

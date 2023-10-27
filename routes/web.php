@@ -17,8 +17,8 @@ use App\Models\User;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-
-Route::get('/users/all', [AuthenticationController::class, 'getAllUsers']);
+Route::get('/users', [AuthenticationController::class, 'index']);
+Route::get('/users/all', [AuthenticationController::class, 'getAllUsers'])->name('get-all-users');
 Route::post('/users/create', [AuthenticationController::class, 'createUser'])->name('store');
 Route::get('/users/{id}',[AuthenticationController::class, 'getUser'])->name('getuser');
 Route::post('/users/{id}', [AuthenticationController::class, 'updateRecord'])->name('edituser');
