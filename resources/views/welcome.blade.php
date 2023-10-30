@@ -298,7 +298,11 @@
         serverSide: true,
         ajax: "{{ route('get-all-users') }}",
         columns: [
-            {data: 'profile_path', name: 'profile_picture'},
+            {data: 'profile_path', name: 'profile_picture',
+             render: function(data) {
+                    return '<img class="pfp" src="{{ asset("storage") }}/' + data + '">';
+                }
+            },
             {data: 'first_name', name: 'first_name'},
             {data: 'last_name', name: 'last_name'},
             {data: 'email', name: 'email'},
@@ -346,6 +350,7 @@
                 if(response.status){
                     $("#registerModal").modal('hide');
                     alert(response.message);
+                    table.ajax.reload(null, false);
                 }
                 else{
                     if($.isEmptyObject(response.data)){
@@ -389,6 +394,7 @@
                         $('#update_form').trigger("reset");
                         $('#edit_user').modal('hide');
                         alert(response.message);
+                        table.ajax.reload(null, false);
                     }
                     else{
                         if($.isEmptyObject(response.data)){

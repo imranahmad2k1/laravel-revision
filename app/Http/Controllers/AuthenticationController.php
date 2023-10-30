@@ -32,17 +32,8 @@ class AuthenticationController extends Controller
 
         $data = User::latest()->get();
         return Datatables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function($user){
-
-                    // <button onclick="deleteUser(event, this, '{{ route('deleteuser', ['id'=>$user->id]) }}')" class="btn btn-danger">Delete</button>
-                    // <button onclick="editUser(event,this,'{{ route('edituser',['id'=>$user->id]) }}',{{$user}})" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">
-
-                    return view('components.useractions', compact('user'))->render();
-                    $btn = '<button onclick="editUser(event, this, \'' . route('edituser', ['id' => $row->id]) . '\', ' . htmlspecialchars(json_encode($row)) . ')" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit_user">Edit</button>';
-                    $btn .= '<button onclick="deleteUser(event, this, \'' . route('deleteuser', ['id' => $row->id]) . '\')" class="btn btn-danger">Delete</button>';
-                    return $btn;                    
-                    
+                ->addColumn('action', function($user){     
+                    return view('components.useractions', compact('user'))->render();                
                 })
                 ->rawColumns(['action'])
                 ->make(true);
