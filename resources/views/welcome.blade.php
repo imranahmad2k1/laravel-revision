@@ -292,6 +292,10 @@
   <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
   <script>
 
+    $('#edit_user').on('hidden.bs.modal', function (e) {
+        $('.error').text(""); // Clear error messages
+    });
+
     // DATA TABLE
     let table = $('#data-table').DataTable({
         processing: true,
@@ -381,7 +385,8 @@
         $('#address_input').val(user['address']);
         $('#city_input').val(user['city']);
 
-        $('#update_form').submit(function (e){
+        $('#update_form').off('submit');
+        $('#update_form').on('submit', function (e){
             let formData = new FormData($(this)[0]);
             e.preventDefault();
             $.ajax({
@@ -407,15 +412,6 @@
                 }
             })
         });
-
-        $('#close_editing_btn').on('click', function(e){
-            $('.error').text("");
-        });
-
-        // if ($(e.target).hasClass('modal')) {
-        //     $('.error').text("");
-        //     $('.modal').modal('hide');
-        // }
     }
     function previewFile() {
         const fileInput = document.getElementById('profile_picture_input');
