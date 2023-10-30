@@ -9,4 +9,14 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+
+    public $callback = [];
+
+    public function setResponse($status, $message, $data = []){
+        $this->callback  = ['status'=>$status, 'message'=>$message, 'data'=>$data];
+    }
+
+    public function getResponse(){
+        return $this->callback;
+    }
 }

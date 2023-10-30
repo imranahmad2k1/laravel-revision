@@ -47,4 +47,48 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function addUser($obj){
+        return \DB::transaction(function () use($obj){
+            $user = new User();
+        
+            $user->first_name = $obj["first_name"];
+            $user->last_name = $obj["last_name"];
+            $user->email = $obj["email"];
+            $user->password = $obj["password"];
+            $user->country = $obj["country"];
+            $user->phone_no = $obj["phone_no"];
+            $user->address = $obj["address"];
+            $user->city = $obj["city"];
+    
+            $user->profile_path = $obj['file_path'];
+    
+            $user->save();
+    
+            return with($user);
+            
+        });
+    }
+
+    // public function updateUser($obj, $user){
+    //     return \DB::transaction(function () use($obj, $user){
+    //         $user->first_name = $obj["first_name"];
+    //         $user->last_name = $obj["last_name"];
+    //         $user->email = $obj["email"];
+    //         $user->password = $obj["password"];
+    //         $user->country = $obj["country"];
+    //         $user->phone_no = $obj["phone_no"];
+    //         $user->address = $obj["address"];
+    //         $user->city = $obj["city"];
+    
+    //         if(array_key_exists('file_path', $obj)){
+    //             $user->profile_path = $obj['file_path'];
+    //         }
+    
+    //         $user->save();
+    
+    //         return with($user);
+            
+    //     });
+    // }
 }

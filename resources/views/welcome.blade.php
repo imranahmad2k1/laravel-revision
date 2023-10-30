@@ -349,6 +349,7 @@
             success: function(response) {
                 if(response.status){
                     $("#registerModal").modal('hide');
+                    $('#create_user_form').trigger("reset");
                     alert(response.message);
                     table.ajax.reload(null, false);
                 }
@@ -397,16 +398,12 @@
                         table.ajax.reload(null, false);
                     }
                     else{
-                        if($.isEmptyObject(response.data)){
-                            alert(response.message);
-                        }
-                        else{
-                            let errors = response.data;
-                            $.each(errors, function(key, value ){
-                                $("#"+key+"_edit").text(value);
-                            });
-                        }
+                        let errors = response.data;
+                        $.each(errors, function(key, value ){
+                            $("#"+key+"_edit").text(value);
+                        });
                     }
+                    
                 }
             })
         });

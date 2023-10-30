@@ -11,6 +11,7 @@ use App\Helpers\Helper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use DataTables;
+use Exception;
 
 class AuthenticationController extends Controller
 {
@@ -20,16 +21,6 @@ class AuthenticationController extends Controller
 
     // Retrieving all Users from the Database
     public function getAllUsers(){
-        // $users = User::all();
-        // if($users){
-        //     $response = ["status"=>true, "message"=>"Successfully retrieved all users", "data"=>$users];
-        // }
-        // else{
-        //     $response = ["status"=>false, "message"=>"Couldn't retrieve users, something went wrong"];
-        // }
-        // return $response;
-
-
         $data = User::latest()->get();
         return Datatables::of($data)
                 ->addColumn('action', function($user){     
@@ -41,133 +32,100 @@ class AuthenticationController extends Controller
 
     // Registering a New User and storing in Database
     public function createUser(Request $request) {
-
-        // Phone number cleaning before 11 digits validation
-        $phone_no = $request->input('phone_no');
-        $cleanedPhoneNo = preg_replace('/\D/', '', $phone_no);
-
-        $validator = Validator::make([
-            'phone_no' => $cleanedPhoneNo,
-            'profile_picture' => $request->file('profile_picture'),
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-            'country' => $request->input('country'),
-            'city' => $request->input('city'),
-            'address' => $request->input('address'),
-        ], [
-            'profile_picture' => 'required|mimes:png,jpg',
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'country' => ['required', Rule::in(Helper::getCountries())],
-            'city' => 'required',
-            'phone_no' => 'required|digits:11',
-            'address' => 'required',
-        ]);
-
-        if ($validator->fails()){
-            return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
+        try{
+            $validator = Validator::make($request->all(),[
+                'profile_picture' => 'required|mimes:png,jpg',
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'email' => 'required|unique:users',
+                'password' => 'required',
+                'country' => ['required', Rule::in(Helper::getCountries())],
+                'city' => 'required',
+                'phone_no' => 'required',
+                'address' => 'required',
+            ]);
+    
+            if ($validator->fails()){
+                parent::setResponse(false,"Invalid inputs!", $validator->errors());
+            }
+            else{
+                // Saving File Locally and Getting File Path to Store in Database
+                $file_path = Helper::pictureUpload($request->file('profile_picture'));
+        
+                // Making a new User in database and copying Request's data into it
+                $user = new User();
+                $form_collect = $request->all();
+                $form_collect['file_path'] = $file_path;
+                $user= $user->addUser($form_collect);
+                
+                if(isset($user->id)){
+                    parent::setResponse(true, 'Successfully saved user', $user);
+                }
+                else{
+                    parent::setResponse(false, "Couldn't save user, something went wrong!");
+    
+                }
+            }
+    
+        }
+        catch(Exception $e){
+            parent::setResponse(false, $e->getMessage());
         }
 
-        // Saving File Locally and Getting File Path to Store in Database
-        $file_path = Helper::pictureUpload($request->file('profile_picture'));
-
-        // Making a new User in database and copying Request's data into it
-        $user = new User();
-
-        $first_name = $request["first_name"];
-        $last_name = $request["last_name"];
-        $email = $request["email"];
-        $password = $request["password"];
-        $country = $request["country"];
-        $phone_no = $request["phone_no"];
-        $address = $request["address"];
-        $city = $request["city"];
-
-        $user->profile_path = $file_path; //File path to the local saved file stored
-        $user->first_name = $first_name;
-        $user->last_name = $last_name;
-        $user->email = $email;
-        $user->password = $password;
-        $user->country = $country;
-        $user->phone_no = $phone_no;
-        $user->address = $address;
-        $user->city = $city;
-
-        $user->save();
-
-        if(isset($user->id)){
-            \Session::flash('new_user', "Added New User");
-            $response = ["status"=>true, "message"=>"Successfully saved user", "data" => $user];
-        }
-        else{
-            $response = ["status"=>false, "message"=>"Couldn't save user, something went wrong!"];
-        }
-        return $response; 
+        return parent::getResponse(); 
     }
 
     public function getUser(String $id){
         $user=User::find($id);
         if($user){
-            $response = ["status"=>true, "message"=>"Successfully retrieved User", "data" => $user];
+            parent::setResponse(true, 'Successfully retrieved User', $user);
         }
         else{
-            $response = ["status"=>false, "message"=>"Couldn't get user, something went wrong!"];
+            parent::setResponse(false, "Couldn't get user, something went wrong!");
         }
-        return $response;
+        return parent::getResponse();
     }
 
     // Updating record of a user in database
     public function updateRecord(Request $request, String $id){
-        // Phone number cleaning before 11 digits validation
-        $phone_no = $request->input('phone_no');
-        $cleanedPhoneNo = preg_replace('/\D/', '', $phone_no);
-
-        $validator = Validator::make([
-            'phone_no' => $cleanedPhoneNo,
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'email' => $request->input('email'),
-            'country' => $request->input('country'),
-            'city' => $request->input('city'),
-            'address' => $request->input('address'),
-        ], [
+        $validator = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
             'country' => ['required', Rule::in(Helper::getCountries())],
             'city' => 'required',
-            'phone_no' => 'required|digits:11',
+            'phone_no' => 'required',
             'address' => 'required',
         ]);
-
-        if ($request->hasFile('profile_picture')) {
-            $validator->sometimes('profile_picture', 'mimes:png,jpg', function ($input) {
-                return $input->hasFile('profile_picture');
-            });
-        }
+        // Applying validation on profile_picture only when it is available in the request 
+        $validator->sometimes('profile_picture', 'mimes:png,jpg', function ($input) {
+            return $input->hasFile('profile_picture');
+        });
 
         if ($validator->fails()){
-            return $response = ["status"=>false, "message"=>"Invalid inputs!", "data" => $validator->errors()];
-        }
-        
-        $user = User::find($id);
-        
-        if($user){
-            if($request->hasFile('profile_picture')){
-                $file_path = Helper::pictureUpload($request->file('profile_picture'));
-                $user->profile_path = $file_path;
-            }
-            $user->update($request->except('profile_picture'));
-            $response = ["status"=>true, "message"=>"Record has been updated"];
+            parent::setResponse(false, 'Invalid inputs!', $validator->errors());
         }
         else{
-            $response = ["status"=>false, "message"=>"Something went wrong!"];
+            $user = User::find($id);
+            if($user){
+                // Only when request has profile picture, uploading it to local storage
+                if($request->hasFile('profile_picture')){
+                    $file_path = Helper::pictureUpload($request->file('profile_picture'));
+
+                    // Setting profile_path in database
+                    $user->profile_path = $file_path;
+                }
+
+                // profile_path for profile_picture already set above
+                $user->update($request->except('profile_picture'));
+                parent::setResponse(true, 'Record has been updated');
+            }
+            else{
+                parent::setResponse(false, "Couldn't find user in the Database");
+            }
         }
-        return $response;
+      
+        return parent::getResponse();
     }
 
     // Deleting a record of user from database
@@ -175,15 +133,13 @@ class AuthenticationController extends Controller
     {
         $user = User::find($id);
         if($user){
-            \Session::flash('delete_success','Successfully deleted '.$user->first_name);
             $user->delete();
-            $response = ["status"=>true, "message"=>"User has been deleted successfully"];
+            parent::setResponse(true, 'User has been deleted successfully');
         }
         else{
-            \Session::flash('delete_fail', "Error: Couldn't find the user in database");
-            $response = ["status"=>false, "message"=>"Couldn't delete user, something went wrong!"];
+            parent::setResponse(false, "Couldn't delete user, something went wrong!");
         }
-        return $response;
+        return parent::getResponse();
     }
 
     // ---------------------IRRELEVANT TO CRUD------------------
