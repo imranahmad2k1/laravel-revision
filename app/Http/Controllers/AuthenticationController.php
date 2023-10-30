@@ -10,6 +10,7 @@ use App\Helpers\Countries;
 use App\Helpers\Helper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Rules\MaskedPhoneNumber;
 use DataTables;
 use Exception;
 
@@ -41,7 +42,7 @@ class AuthenticationController extends Controller
                 'password' => 'required',
                 'country' => ['required', Rule::in(Helper::getCountries())],
                 'city' => 'required',
-                'phone_no' => 'required',
+                'phone_no' => ['required', new MaskedPhoneNumber],
                 'address' => 'required',
             ]);
     
@@ -94,7 +95,7 @@ class AuthenticationController extends Controller
             'email' => ['required', Rule::unique('users')->ignore($id)], // Ignore the current user's email],
             'country' => ['required', Rule::in(Helper::getCountries())],
             'city' => 'required',
-            'phone_no' => 'required',
+            'phone_no' => ['required', new MaskedPhoneNumber],
             'address' => 'required',
         ]);
         // Applying validation on profile_picture only when it is available in the request 
