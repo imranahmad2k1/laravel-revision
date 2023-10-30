@@ -91,7 +91,7 @@ class AuthenticationController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required',
+            'email' => ['required', Rule::unique('users')->ignore($id)], // Ignore the current user's email],
             'country' => ['required', Rule::in(Helper::getCountries())],
             'city' => 'required',
             'phone_no' => 'required',
